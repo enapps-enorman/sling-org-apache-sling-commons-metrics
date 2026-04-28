@@ -37,10 +37,11 @@ import org.apache.sling.commons.metrics.MetricsService;
 import org.apache.sling.commons.metrics.Timer;
 import org.apache.sling.testing.mock.osgi.MapUtil;
 import org.apache.sling.testing.mock.osgi.MockOsgi;
-import org.apache.sling.testing.mock.osgi.junit.OsgiContext;
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
+import org.apache.sling.testing.mock.osgi.junit5.OsgiContext;
+import org.apache.sling.testing.mock.osgi.junit5.OsgiContextExtension;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.osgi.framework.ServiceRegistration;
 
 import static org.apache.sling.commons.metrics.internal.BundleMetricsMapper.JMX_TYPE_METRICS;
@@ -48,26 +49,27 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class MetricServiceTest {
-    @Rule
+@ExtendWith(OsgiContextExtension.class)
+class MetricServiceTest {
     public final OsgiContext context = new OsgiContext();
 
     private MetricsServiceImpl service = new MetricsServiceImpl();
 
-    @After
-    public void deactivate() {
+    @AfterEach
+    void deactivate() {
         MockOsgi.deactivate(service, context.bundleContext());
     }
 
     @Test
-    public void defaultSetup() throws Exception {
+    void defaultSetup() {
         activate();
 
         assertNotNull(context.getService(MetricRegistry.class));
@@ -82,7 +84,7 @@ public class MetricServiceTest {
     }
 
     @Test
-    public void meter() throws Exception {
+    void meter() {
         activate();
         Meter meter = service.meter("test");
 
@@ -93,7 +95,7 @@ public class MetricServiceTest {
     }
 
     @Test
-    public void counter() throws Exception {
+    void counter() {
         activate();
         Counter counter = service.counter("test");
 
@@ -104,7 +106,7 @@ public class MetricServiceTest {
     }
 
     @Test
-    public void timer() throws Exception {
+    void timer() {
         activate();
         Timer timer = service.timer("test");
 
@@ -115,7 +117,7 @@ public class MetricServiceTest {
     }
 
     @Test
-    public void histogram() throws Exception {
+    void histogram() {
         activate();
         Histogram histo = service.histogram("test");
 
@@ -126,27 +128,27 @@ public class MetricServiceTest {
     }
 
     @Test
-    public void gaugeRegistration() throws Exception {
+    void gaugeRegistration() {
         activate();
         Gauge<Long> gauge = service.gauge("gauge", () -> 42L);
         assertNotNull(gauge);
         assertTrue(getRegistry().getGauges().containsKey("gauge"));
-        assertEquals(new Long(42L), gauge.getValue());
+        assertEquals(Long.valueOf(42L), gauge.getValue());
 
         // Just the name matters, not the supplier
         Gauge<?> gauge2 = service.gauge("gauge", () -> 43L);
         assertSame(gauge, gauge2);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void sameNameDifferentTypeMetric() throws Exception {
+    @Test
+    void sameNameDifferentTypeMetric() {
         activate();
         service.histogram("test");
-        service.timer("test");
+        assertThrows(IllegalArgumentException.class, () -> service.timer("test"));
     }
 
     @Test
-    public void jmxRegistration() throws Exception {
+    void jmxRegistration() throws Exception {
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         activate();
         Meter meter = service.meter("test");
@@ -163,8 +165,9 @@ public class MetricServiceTest {
     }
 
     @Test
-    public void gaugeRegistrationViaWhiteboard() throws Exception {
+    void gaugeRegistrationViaWhiteboard() {
         activate();
+        @SuppressWarnings("rawtypes")
         ServiceRegistration<Gauge> reg = context.bundleContext()
                 .registerService(Gauge.class, new TestGauge(42), MapUtil.toDictionary(Gauge.NAME, "foo"));
 
@@ -176,7 +179,7 @@ public class MetricServiceTest {
     }
 
     @Test
-    public void unregisterMetric() {
+    void unregisterMetric() {
         activate();
         Gauge<Long> gauge = service.gauge("gauge", () -> 42L);
         assertNotNull(gauge);
@@ -193,7 +196,7 @@ public class MetricServiceTest {
         MockOsgi.activate(service, context.bundleContext(), Collections.<String, Object>emptyMap());
     }
 
-    private static class TestGauge implements Gauge {
+    private static class TestGauge implements Gauge<Object> {
         int value;
 
         public TestGauge(int value) {

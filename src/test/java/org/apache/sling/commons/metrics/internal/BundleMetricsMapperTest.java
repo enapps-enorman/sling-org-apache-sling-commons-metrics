@@ -24,14 +24,16 @@ import java.util.Map;
 
 import com.codahale.metrics.MetricRegistry;
 import org.apache.sling.testing.mock.osgi.MockBundle;
-import org.apache.sling.testing.mock.osgi.junit.OsgiContext;
-import org.junit.Rule;
-import org.junit.Test;
+import org.apache.sling.testing.mock.osgi.junit5.OsgiContext;
+import org.apache.sling.testing.mock.osgi.junit5.OsgiContextExtension;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BundleMetricsMapperTest {
-    @Rule
+@ExtendWith(OsgiContextExtension.class)
+class BundleMetricsMapperTest {
+
     public final OsgiContext context = new OsgiContext();
 
     private MetricRegistry registry = new MetricRegistry();
@@ -39,13 +41,13 @@ public class BundleMetricsMapperTest {
     private BundleMetricsMapper mapper = new BundleMetricsMapper(new MetricsServiceImpl(), registry);
 
     @Test
-    public void defaultDomainName() throws Exception {
+    void defaultDomainName() {
         ObjectName name = mapper.createName("counter", "foo", "bar");
         assertEquals("foo", name.getDomain());
     }
 
     @Test
-    public void mappedName_SymbolicName() throws Exception {
+    void mappedName_SymbolicName() {
         MockBundle bundle = new MockBundle(context.bundleContext());
         bundle.setSymbolicName("com.example");
 
@@ -56,7 +58,7 @@ public class BundleMetricsMapperTest {
     }
 
     @Test
-    public void mappedName_Header() throws Exception {
+    void mappedName_Header() {
         MockBundle bundle = new MockBundle(context.bundleContext());
         bundle.setSymbolicName("com.example");
         bundle.setHeaders(Map.of(BundleMetricsMapper.HEADER_DOMAIN_NAME, "com.test"));

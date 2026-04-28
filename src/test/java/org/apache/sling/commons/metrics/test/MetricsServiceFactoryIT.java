@@ -71,6 +71,7 @@ public class MetricsServiceFactoryIT extends TestSupport {
             MetricsServiceFactory.getMetricsService(null);
             fail("Expecting an Exception");
         } catch (IllegalArgumentException asExpected) {
+            // expected
         }
     }
 
@@ -80,6 +81,7 @@ public class MetricsServiceFactoryIT extends TestSupport {
             MetricsServiceFactory.getMetricsService(String.class);
             fail("Expecting an Exception");
         } catch (IllegalArgumentException asExpected) {
+            // expected
         }
     }
 

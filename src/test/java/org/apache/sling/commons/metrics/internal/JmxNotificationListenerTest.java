@@ -24,16 +24,16 @@ import javax.management.MBeanServerNotification;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-public class JmxNotificationListenerTest {
+class JmxNotificationListenerTest {
 
     JmxExporterFactory exporter = new JmxExporterFactory();
     NotificationListener listener = exporter.listener;
 
     @Test
-    public void testHandleNotification() throws Exception {
+    void testHandleNotification() throws Exception {
         exporter.patterns = new String[] {"test:type=Test"};
         exporter.server = Mockito.mock(MBeanServer.class);
         MBeanInfo m = Mockito.mock(MBeanInfo.class);
@@ -41,7 +41,7 @@ public class JmxNotificationListenerTest {
         Mockito.when(notification.getType()).thenReturn("JMX.mbean.registered");
         ObjectName objectName = new ObjectName("test:type=Test");
         Mockito.when(notification.getMBeanName()).thenReturn(objectName);
-        Mockito.when(exporter.server.getMBeanInfo(Mockito.eq(objectName))).thenReturn(m);
+        Mockito.when(exporter.server.getMBeanInfo(objectName)).thenReturn(m);
         Mockito.when(m.getAttributes()).thenReturn(new javax.management.MBeanAttributeInfo[0]);
         listener.handleNotification(notification, null);
 
