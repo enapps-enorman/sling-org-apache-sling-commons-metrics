@@ -18,11 +18,6 @@
  */
 package org.apache.sling.commons.metrics.internal;
 
-import javax.servlet.Servlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -43,6 +38,10 @@ import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Snapshot;
 import com.codahale.metrics.Timer;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.io.output.WriterOutputStream;
 import org.apache.felix.inventory.Format;
 import org.apache.felix.inventory.InventoryPrinter;
@@ -75,19 +74,20 @@ public class MetricWebConsolePlugin extends HttpServlet
      */
     public static final String METRIC_REGISTRY_NAME = "name";
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
-    private BundleContext context;
-    private ServiceTracker<MetricRegistry, MetricRegistry> tracker;
-    private ConcurrentMap<ServiceReference, MetricRegistry> registries = new ConcurrentHashMap<>();
+    private final transient Logger log = LoggerFactory.getLogger(getClass());
+    private final transient BundleContext context;
+    private final transient ServiceTracker<MetricRegistry, MetricRegistry> tracker;
+    private final transient ConcurrentMap<ServiceReference<MetricRegistry>, MetricRegistry> registries =
+            new ConcurrentHashMap<>();
 
-    private TimeUnit rateUnit = TimeUnit.SECONDS;
-    private TimeUnit durationUnit = TimeUnit.MILLISECONDS;
-    private Map<String, TimeUnit> specificDurationUnits = Collections.emptyMap();
-    private Map<String, TimeUnit> specificRateUnits = Collections.emptyMap();
-    private MetricTimeUnits timeUnit;
+    private final transient TimeUnit rateUnit = TimeUnit.SECONDS;
+    private final transient TimeUnit durationUnit = TimeUnit.MILLISECONDS;
+    private final transient Map<String, TimeUnit> specificDurationUnits = Collections.emptyMap();
+    private final transient Map<String, TimeUnit> specificRateUnits = Collections.emptyMap();
+    private final transient MetricTimeUnits timeUnit;
 
     @Activate
-    private void activate(BundleContext context) {
+    public MetricWebConsolePlugin(BundleContext context) {
         this.context = context;
         this.timeUnit = new MetricTimeUnits(rateUnit, durationUnit, specificRateUnits, specificDurationUnits);
         tracker = new ServiceTracker<>(context, MetricRegistry.class, this);
@@ -422,7 +422,7 @@ public class MetricWebConsolePlugin extends HttpServlet
 
     MetricRegistry getConsolidatedRegistry() {
         MetricRegistry registry = new MetricRegistry();
-        for (Map.Entry<ServiceReference, MetricRegistry> registryEntry : registries.entrySet()) {
+        for (Map.Entry<ServiceReference<MetricRegistry>, MetricRegistry> registryEntry : registries.entrySet()) {
             String metricRegistryName = (String) registryEntry.getKey().getProperty(METRIC_REGISTRY_NAME);
             for (Map.Entry<String, Metric> metricEntry :
                     registryEntry.getValue().getMetrics().entrySet()) {
