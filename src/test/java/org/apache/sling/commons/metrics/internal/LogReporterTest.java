@@ -25,19 +25,24 @@ import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Slf4jReporter;
 import junitx.util.PrivateAccessor;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
-public class LogReporterTest {
+@ExtendWith(MockitoExtension.class)
+class LogReporterTest {
 
     @Mock
     private BundleContext bundleContext;
@@ -45,8 +50,9 @@ public class LogReporterTest {
     LogReporter reporterService = new LogReporter();
 
     @Test
-    public void testSpecificRegistryNameInclude() {
+    void testSpecificRegistryNameInclude() {
         MetricRegistry registry = new MetricRegistry();
+        @SuppressWarnings("unchecked")
         ServiceReference<MetricRegistry> registryServiceReference = mock(ServiceReference.class);
         when(bundleContext.getService(registryServiceReference)).thenReturn(registry);
         when(registryServiceReference.getProperty(MetricWebConsolePlugin.METRIC_REGISTRY_NAME))
@@ -68,8 +74,9 @@ public class LogReporterTest {
     }
 
     @Test
-    public void testSpecificRegistryNameExclude() {
+    void testSpecificRegistryNameExclude() {
         MetricRegistry registry = new MetricRegistry();
+        @SuppressWarnings("unchecked")
         ServiceReference<MetricRegistry> registryServiceReference = mock(ServiceReference.class);
         when(bundleContext.getService(registryServiceReference)).thenReturn(registry);
         when(registryServiceReference.getProperty(MetricWebConsolePlugin.METRIC_REGISTRY_NAME))
@@ -91,8 +98,9 @@ public class LogReporterTest {
     }
 
     @Test
-    public void testSpecificRegistryNameExcludeNullName() {
+    void testSpecificRegistryNameExcludeNullName() {
         MetricRegistry registry = new MetricRegistry();
+        @SuppressWarnings("unchecked")
         ServiceReference<MetricRegistry> registryServiceReference = mock(ServiceReference.class);
         when(bundleContext.getService(registryServiceReference)).thenReturn(registry);
 
@@ -112,8 +120,9 @@ public class LogReporterTest {
     }
 
     @Test
-    public void testLoggerName() throws Exception {
+    void testLoggerName() throws Exception {
         MetricRegistry registry = new MetricRegistry();
+        @SuppressWarnings("unchecked")
         ServiceReference<MetricRegistry> registryServiceReference = mock(ServiceReference.class);
         when(bundleContext.getService(registryServiceReference)).thenReturn(registry);
 
@@ -139,8 +148,9 @@ public class LogReporterTest {
     }
 
     @Test
-    public void testPrefix() throws Exception {
+    void testPrefix() throws Exception {
         MetricRegistry registry = new MetricRegistry();
+        @SuppressWarnings("unchecked")
         ServiceReference<MetricRegistry> registryServiceReference = mock(ServiceReference.class);
         when(bundleContext.getService(registryServiceReference)).thenReturn(registry);
 
@@ -165,8 +175,9 @@ public class LogReporterTest {
     }
 
     @Test
-    public void testPattern() throws Exception {
+    void testPattern() throws Exception {
         MetricRegistry registry = new MetricRegistry();
+        @SuppressWarnings("unchecked")
         ServiceReference<MetricRegistry> registryServiceReference = mock(ServiceReference.class);
         when(bundleContext.getService(registryServiceReference)).thenReturn(registry);
 
@@ -191,8 +202,9 @@ public class LogReporterTest {
     }
 
     @Test
-    public void testPrefixAndPattern() throws Exception {
+    void testPrefixAndPattern() throws Exception {
         MetricRegistry registry = new MetricRegistry();
+        @SuppressWarnings("unchecked")
         ServiceReference<MetricRegistry> registryServiceReference = mock(ServiceReference.class);
         when(bundleContext.getService(registryServiceReference)).thenReturn(registry);
 
@@ -217,17 +229,19 @@ public class LogReporterTest {
     }
 
     @Test
-    public void testRemove() {
+    void testRemove() {
         Slf4jReporter reporter = mock(Slf4jReporter.class);
         reporterService.removedService(null, reporter);
         verify(reporter, times(1)).close();
     }
 
     @Test
-    public void testNoOpCalls() {
-        // extra no-op calls for coverage
-        reporterService.removedService(null, null);
-        reporterService.modifiedService(null, null);
+    void testNoOpCalls() {
+        assertDoesNotThrow(() -> {
+            // extra no-op calls for coverage
+            reporterService.removedService(null, null);
+            reporterService.modifiedService(null, null);
+        });
     }
 
     private LogReporter.Config createConfigWithRegistryName(final String registryName) {

@@ -37,25 +37,25 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import org.apache.sling.commons.metrics.MetricsService;
-import org.apache.sling.testing.mock.osgi.junit.OsgiContext;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.apache.sling.testing.mock.osgi.junit5.OsgiContext;
+import org.apache.sling.testing.mock.osgi.junit5.OsgiContextExtension;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.never;
 
-@RunWith(MockitoJUnitRunner.class)
-public class JmxExporterFactoryTest {
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(OsgiContextExtension.class)
+class JmxExporterFactoryTest {
 
-    @Rule
     public OsgiContext context = new OsgiContext();
 
     @Captor
@@ -103,10 +103,10 @@ public class JmxExporterFactoryTest {
 
     MetricsService metrics;
     NotificationListener listener;
-    SimpleBean mbeans[] = {new SimpleBean(0, 0L), new SimpleBean(1, 1L), new SimpleBean(2, 2L)};
+    SimpleBean[] mbeans = {new SimpleBean(0, 0L), new SimpleBean(1, 1L), new SimpleBean(2, 2L)};
 
-    @Before
-    public void setup()
+    @BeforeEach
+    void setup()
             throws MalformedObjectNameException, InstanceAlreadyExistsException, MBeanRegistrationException,
                     NotCompliantMBeanException, InstanceNotFoundException {
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
@@ -123,8 +123,8 @@ public class JmxExporterFactoryTest {
         context.registerService(MetricsService.class, metrics);
     }
 
-    @After
-    public void shutdown() throws MBeanRegistrationException, InstanceNotFoundException, MalformedObjectNameException {
+    @AfterEach
+    void shutdown() throws MBeanRegistrationException, InstanceNotFoundException, MalformedObjectNameException {
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         server.unregisterMBean(new ObjectName(OBJECT_NAME_0));
         server.unregisterMBean(new ObjectName(OBJECT_NAME_1));
@@ -132,7 +132,7 @@ public class JmxExporterFactoryTest {
     }
 
     @Test
-    public void test() {
+    void test() {
         Map<String, Object> props = new HashMap<>();
         props.put("objectnames", new String[] {OBJECT_NAME_QUERY});
 
@@ -181,7 +181,7 @@ public class JmxExporterFactoryTest {
     }
 
     @Test
-    public void registerNonExistingMBean() {
+    void registerNonExistingMBean() {
         Map<String, Object> props = new HashMap<>();
         props.put("objectnames", new String[] {"org.apache.sling:type=nonexistent"}); // there is no such mbean
 
@@ -190,7 +190,7 @@ public class JmxExporterFactoryTest {
     }
 
     @Test
-    public void registerInvalidMBean() {
+    void registerInvalidMBean() {
         Map<String, Object> props = new HashMap<>();
         props.put("objectnames", new String[] {"org.apache.sling%type=nonexistent"}); // this is invalid
 
@@ -199,7 +199,7 @@ public class JmxExporterFactoryTest {
     }
 
     @Test
-    public void checkNotificationListener() throws Exception {
+    void checkNotificationListener() throws Exception {
         MBeanServer server = ManagementFactory.getPlatformMBeanServer();
         ObjectName test = new ObjectName("com.example:type=TestMBean");
         server.registerMBean(new SimpleBean(1, 1L), test);

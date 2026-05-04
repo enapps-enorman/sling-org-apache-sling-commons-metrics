@@ -28,15 +28,15 @@ import com.codahale.metrics.JvmAttributeGaugeSet;
 import com.codahale.metrics.MetricRegistry;
 import org.apache.commons.io.output.WriterOutputStream;
 import org.apache.felix.utils.json.JSONParser;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class JSONReporterTest {
+class JSONReporterTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void jsonOutput() throws Exception {
+    void jsonOutput() throws Exception {
         MetricRegistry registry = new MetricRegistry();
         registry.meter("test1").mark(5);
         registry.timer("test2").time().close();
@@ -61,7 +61,7 @@ public class JSONReporterTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void nan_value() throws Exception {
+    void nan_value() throws Exception {
         MetricRegistry registry = new MetricRegistry();
 
         registry.register("test", new Gauge<Double>() {
@@ -78,7 +78,8 @@ public class JSONReporterTest {
     private static Map<String, Object> getJSON(MetricRegistry registry) throws IOException {
         StringWriter sw = new StringWriter();
         JSONReporter reporter = JSONReporter.forRegistry(registry)
-                .outputTo(new PrintStream(new WriterOutputStream(sw)))
+                .outputTo(new PrintStream(
+                        WriterOutputStream.builder().setWriter(sw).get()))
                 .build();
         reporter.report();
         reporter.close();

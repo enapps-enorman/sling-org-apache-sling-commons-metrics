@@ -30,29 +30,29 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apache.felix.inventory.Format;
 import org.apache.felix.utils.json.JSONParser;
 import org.apache.sling.testing.mock.osgi.MockOsgi;
-import org.apache.sling.testing.mock.sling.junit.SlingContext;
+import org.apache.sling.testing.mock.sling.junit5.SlingContext;
+import org.apache.sling.testing.mock.sling.junit5.SlingContextExtension;
 import org.htmlunit.WebClient;
 import org.htmlunit.html.HtmlPage;
 import org.htmlunit.html.HtmlTable;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-@RunWith(MockitoJUnitRunner.class)
-public class MetricWebConsolePluginTest {
-    @Rule
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(SlingContextExtension.class)
+class MetricWebConsolePluginTest {
     public final SlingContext context = new SlingContext();
 
     private MetricWebConsolePlugin plugin = new MetricWebConsolePlugin(context.bundleContext());
@@ -64,7 +64,7 @@ public class MetricWebConsolePluginTest {
     }
 
     @Test
-    public void consolidatedRegistry() {
+    void consolidatedRegistry() {
         MetricRegistry reg1 = new MetricRegistry();
         reg1.meter("test1");
         context.registerService(MetricRegistry.class, reg1, regProps("foo"));
@@ -103,7 +103,7 @@ public class MetricWebConsolePluginTest {
     }
 
     @Test
-    public void inventory_text() {
+    void inventory_text() {
         MetricRegistry reg1 = new MetricRegistry();
         reg1.meter("test1").mark(5);
         context.registerService(MetricRegistry.class, reg1, regProps("foo"));
@@ -121,7 +121,7 @@ public class MetricWebConsolePluginTest {
     }
 
     @Test
-    public void inventory_json() {
+    void inventory_json() {
         MetricRegistry reg1 = new MetricRegistry();
         reg1.meter("test1").mark(5);
         context.registerService(MetricRegistry.class, reg1, regProps("foo"));
@@ -138,7 +138,7 @@ public class MetricWebConsolePluginTest {
     }
 
     @Test
-    public void webConsolePlugin() throws Exception {
+    void webConsolePlugin() throws Exception {
         MetricRegistry reg1 = new MetricRegistry();
         reg1.meter("test1").mark(5);
         reg1.timer("test2").time().close();

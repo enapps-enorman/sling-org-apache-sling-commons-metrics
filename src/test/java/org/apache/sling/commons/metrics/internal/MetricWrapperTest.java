@@ -26,16 +26,16 @@ import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
-public class MetricWrapperTest {
+class MetricWrapperTest {
     private MetricRegistry registry = new MetricRegistry();
 
     @Test
-    public void counter() throws Exception {
+    void counter() {
         Counter counter = registry.counter("test");
         CounterImpl counterStats = new CounterImpl(counter);
 
@@ -64,7 +64,7 @@ public class MetricWrapperTest {
     }
 
     @Test
-    public void meter() throws Exception {
+    void meter() {
         Meter meter = registry.meter("test");
         MeterImpl meterStats = new MeterImpl(meter);
 
@@ -79,7 +79,7 @@ public class MetricWrapperTest {
     }
 
     @Test
-    public void timer() throws Exception {
+    void timer() {
         Timer time = registry.timer("test");
         TimerImpl timerStats = new TimerImpl(time);
 
@@ -94,7 +94,7 @@ public class MetricWrapperTest {
     }
 
     @Test
-    public void histogram() throws Exception {
+    void histogram() {
         Histogram histo = registry.histogram("test");
         HistogramImpl histoStats = new HistogramImpl(histo);
 
@@ -107,7 +107,7 @@ public class MetricWrapperTest {
     }
 
     @Test
-    public void timerContext() throws Exception {
+    void timerContext() throws Exception {
         VirtualClock clock = new VirtualClock();
         Timer time = new Timer(new ExponentiallyDecayingReservoir(), clock);
 

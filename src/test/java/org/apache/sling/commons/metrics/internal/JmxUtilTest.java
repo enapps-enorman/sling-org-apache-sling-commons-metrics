@@ -18,29 +18,28 @@
  */
 package org.apache.sling.commons.metrics.internal;
 
-import junit.framework.TestCase;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class JmxUtilTest {
+class JmxUtilTest {
 
     @Test
-    public void quotation() throws Exception {
+    void quotation() {
         assertEquals("text", JmxUtil.quoteValueIfRequired("text"));
-        TestCase.assertEquals("", JmxUtil.quoteValueIfRequired(""));
+        assertEquals("", JmxUtil.quoteValueIfRequired(""));
         assertTrue(JmxUtil.quoteValueIfRequired("text*with?chars").startsWith("\""));
     }
 
     @Test
-    public void quoteAndComma() throws Exception {
+    void quoteAndComma() {
         assertTrue(JmxUtil.quoteValueIfRequired("text,withComma").startsWith("\""));
         assertTrue(JmxUtil.quoteValueIfRequired("text=withEqual").startsWith("\""));
     }
 
     @Test
-    public void safeDomainName() throws Exception {
+    void safeDomainName() {
         assertEquals("com.foo", JmxUtil.safeDomainName("com.foo"));
         assertEquals("com_foo", JmxUtil.safeDomainName("com:foo"));
         assertEquals("com_foo", JmxUtil.safeDomainName("com?foo"));
